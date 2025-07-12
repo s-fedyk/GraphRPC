@@ -1,8 +1,0 @@
-# Simple query
-query {
-  user {
-    id
-    name
-    email
-  }
-}
