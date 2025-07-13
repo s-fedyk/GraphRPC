@@ -1,0 +1,16 @@
+query GetStarship($id: ID!) {
+  starship(id: $id) {
+    id
+    name
+    length(unit: METER)
+  }
+}
+
+query GetAllStarships {
+  starships {
+    id
+    name
+    length
+  }
+  hello(name: "GraphRPC")
+}

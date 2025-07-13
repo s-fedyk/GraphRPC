@@ -1,0 +1,20 @@
+enum LengthUnit {
+  METER
+  FOOT
+}
+
+type Starship {
+  id: ID!
+  name: String!
+  length(unit: LengthUnit = METER): Float
+}
+
+type Query {
+  starship(id: ID!): Starship
+  starships: [Starship!]!
+  hello(name: String = "World"): String!
+}
+
+schema {
+  query: Query
+}

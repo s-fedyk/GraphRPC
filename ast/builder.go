@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"fmt"
 	"github.com/antlr4-go/antlr/v4"
 	parser "graphrpc.com/parser/gen"
 )
@@ -16,46 +17,57 @@ func NewASTBuilder() *ASTBuilder {
 }
 
 func (b *ASTBuilder) VisitDocument(ctx *parser.DocumentContext) interface{} {
+	fmt.Printf("VisitDocument: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
 func (b *ASTBuilder) VisitDefinition(ctx *parser.DefinitionContext) interface{} {
+	fmt.Printf("VisitDefinition: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
 func (b *ASTBuilder) VisitExecutableDocument(ctx *parser.ExecutableDocumentContext) interface{} {
+	fmt.Printf("VisitExecutableDocument: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
 func (b *ASTBuilder) VisitExecutableDefinition(ctx *parser.ExecutableDefinitionContext) interface{} {
+	fmt.Printf("VisitExecutableDefinition: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
 func (b *ASTBuilder) VisitOperationDefinition(ctx *parser.OperationDefinitionContext) interface{} {
+	fmt.Printf("VisitOperationDefinition: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
 func (b *ASTBuilder) VisitOperationType(ctx *parser.OperationTypeContext) interface{} {
+	fmt.Printf("VisitOperationType: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
 func (b *ASTBuilder) VisitSelectionSet(ctx *parser.SelectionSetContext) interface{} {
+	fmt.Printf("VisitSelectionSet: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
 func (b *ASTBuilder) VisitSelection(ctx *parser.SelectionContext) interface{} {
+	fmt.Printf("VisitSelection: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
 func (b *ASTBuilder) VisitField(ctx *parser.FieldContext) interface{} {
+	fmt.Printf("VisitField: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
 func (b *ASTBuilder) VisitArguments(ctx *parser.ArgumentsContext) interface{} {
+	fmt.Printf("VisitArguments: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
 func (b *ASTBuilder) VisitArgument(ctx *parser.ArgumentContext) interface{} {
+	fmt.Printf("VisitArgument: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
@@ -84,6 +96,7 @@ func (b *ASTBuilder) VisitInlineFragment(ctx *parser.InlineFragmentContext) inte
 }
 
 func (b *ASTBuilder) VisitValue(ctx *parser.ValueContext) interface{} {
+	fmt.Printf("VisitValue: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
@@ -100,6 +113,7 @@ func (b *ASTBuilder) VisitBooleanValue(ctx *parser.BooleanValueContext) interfac
 }
 
 func (b *ASTBuilder) VisitStringValue(ctx *parser.StringValueContext) interface{} {
+	fmt.Printf("VisitStringValue: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
@@ -192,6 +206,7 @@ func (b *ASTBuilder) VisitDescription(ctx *parser.DescriptionContext) interface{
 }
 
 func (b *ASTBuilder) VisitTypeDefinition(ctx *parser.TypeDefinitionContext) interface{} {
+	fmt.Printf("VisitTypeDefinition: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
@@ -208,6 +223,7 @@ func (b *ASTBuilder) VisitScalarTypeExtension(ctx *parser.ScalarTypeExtensionCon
 }
 
 func (b *ASTBuilder) VisitObjectTypeDefinition(ctx *parser.ObjectTypeDefinitionContext) interface{} {
+	fmt.Printf("VisitObjectTypeDefinition: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
@@ -220,6 +236,7 @@ func (b *ASTBuilder) VisitFieldsDefinition(ctx *parser.FieldsDefinitionContext) 
 }
 
 func (b *ASTBuilder) VisitFieldDefinition(ctx *parser.FieldDefinitionContext) interface{} {
+	fmt.Printf("VisitFieldDefinition: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
@@ -304,11 +321,11 @@ func (b *ASTBuilder) VisitTypeSystemDirectiveLocation(ctx *parser.TypeSystemDire
 }
 
 func (b *ASTBuilder) VisitName(ctx *parser.NameContext) interface{} {
+	fmt.Printf("VisitName: %s\n", ctx.GetText())
 	return b.VisitChildren(ctx)
 }
 
 func (b *ASTBuilder) VisitChildren(ctx antlr.RuleNode) interface{} {
-
 	for _, child := range ctx.GetChildren() {
 		child.(antlr.ParseTree).Accept(b)
 	}

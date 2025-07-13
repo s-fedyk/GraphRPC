@@ -413,4 +413,3 @@ func (o *ObjectTypeExtension) String() string {
 func (o *ObjectTypeExtension) GetLocation() *Location    { return o.Location }
 func (o *ObjectTypeExtension) definitionNode()           {}
 func (o *ObjectTypeExtension) typeSystemDefinitionNode() {}
-
