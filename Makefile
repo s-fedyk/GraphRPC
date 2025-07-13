@@ -1,3 +1,3 @@
 run:
-	go run main.go examples/test_query.graphql
+	go run main.go examples/schema.graphql
 

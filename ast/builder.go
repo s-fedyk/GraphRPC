@@ -2,6 +2,8 @@ package ast
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/antlr4-go/antlr/v4"
 	parser "graphrpc.com/parser/gen"
 )
@@ -18,7 +20,17 @@ func NewASTBuilder() *ASTBuilder {
 
 func (b *ASTBuilder) VisitDocument(ctx *parser.DocumentContext) interface{} {
 	fmt.Printf("VisitDocument: %s\n", ctx.GetText())
-	return b.VisitChildren(ctx)
+
+	document := Document{}
+
+	result := b.VisitChildren(ctx)
+
+	// TODO, more specific nodetype.
+	if operations, ok := result.([]*Node); ok {
+		document.Operations = operations
+	}
+
+	return document
 }
 
 func (b *ASTBuilder) VisitDefinition(ctx *parser.DefinitionContext) interface{} {
@@ -154,11 +166,19 @@ func (b *ASTBuilder) VisitDefaultValue(ctx *parser.DefaultValueContext) interfac
 }
 
 func (b *ASTBuilder) VisitType_(ctx *parser.Type_Context) interface{} {
-	return b.VisitChildren(ctx)
+	return ctx.GetChild(0).(antlr.ParseTree).Accept(b)
 }
 
+// We later resolve the types.
 func (b *ASTBuilder) VisitNamedType(ctx *parser.NamedTypeContext) interface{} {
-	return b.VisitChildren(ctx)
+	nodeString := ctx.GetText()
+
+	typeInfo := TypeInfo{
+		Nullable: strings.HasSuffix(nodeString, "!"),
+		Type:     strings.TrimSuffix(nodeString, "!"),
+	}
+
+	return typeInfo
 }
 
 func (b *ASTBuilder) VisitListType(ctx *parser.ListTypeContext) interface{} {
@@ -178,7 +198,11 @@ func (b *ASTBuilder) VisitTypeSystemDocument(ctx *parser.TypeSystemDocumentConte
 }
 
 func (b *ASTBuilder) VisitTypeSystemDefinition(ctx *parser.TypeSystemDefinitionContext) interface{} {
-	return b.VisitChildren(ctx)
+	results := b.VisitChildren(ctx)
+
+	fmt.Printf("Results are %v", results)
+
+	return results
 }
 
 func (b *ASTBuilder) VisitTypeSystemExtensionDocument(ctx *parser.TypeSystemExtensionDocumentContext) interface{} {
@@ -223,8 +247,45 @@ func (b *ASTBuilder) VisitScalarTypeExtension(ctx *parser.ScalarTypeExtensionCon
 }
 
 func (b *ASTBuilder) VisitObjectTypeDefinition(ctx *parser.ObjectTypeDefinitionContext) interface{} {
-	fmt.Printf("VisitObjectTypeDefinition: %s\n", ctx.GetText())
-	return b.VisitChildren(ctx)
+
+	results, ok := b.VisitChildren(ctx).([]interface{})
+	nameNode, ok := results[0].(Node)
+
+	if !ok {
+		panic("Cannot unpack object name")
+	}
+
+	if !ok {
+		panic("Cannot unpack object definitions")
+	}
+
+	fmt.Printf("Created children... %v\n", results[1:])
+	childNodes, ok := results[1].([]interface{})
+
+	if !ok {
+		fmt.Printf("cannot unpack childnodes! %v", childNodes)
+	}
+	var childMap = map[string]ValueNode{}
+
+	for _, child := range childNodes {
+		valueNode, ok := child.(ValueNode)
+		if !ok {
+			panic("Cannot unpack valuenode")
+		}
+
+		childMap[valueNode.Name] = valueNode
+	}
+
+	return ObjectNode{
+		ValueNode{
+			Node{nameNode.Name},
+			TypeInfo{
+				false,
+				"object",
+			},
+		},
+		childMap,
+	}
 }
 
 func (b *ASTBuilder) VisitImplementsInterfaces(ctx *parser.ImplementsInterfacesContext) interface{} {
@@ -235,9 +296,37 @@ func (b *ASTBuilder) VisitFieldsDefinition(ctx *parser.FieldsDefinitionContext) 
 	return b.VisitChildren(ctx)
 }
 
+// TODO: Add Conditional filtering on descriptions.
 func (b *ASTBuilder) VisitFieldDefinition(ctx *parser.FieldDefinitionContext) interface{} {
 	fmt.Printf("VisitFieldDefinition: %s\n", ctx.GetText())
-	return b.VisitChildren(ctx)
+
+	children := ctx.GetChildren()
+
+	if len(children) < 2 {
+		panic("A field definition needs a name:value pair.")
+	}
+
+	childNodes, ok := b.VisitChildren(ctx).([]interface{})
+
+	if !ok {
+		panic("expected []interface{}")
+	}
+
+	node, ok := childNodes[0].(Node)
+	if !ok {
+		panic("Cannot unpack Node")
+	}
+
+	typeInfo, ok := childNodes[1].(TypeInfo)
+
+	if !ok {
+		panic("Cannot unpack typeInfo")
+	}
+
+	return ValueNode{
+		Node:     node,
+		TypeInfo: typeInfo,
+	}
 }
 
 func (b *ASTBuilder) VisitArgumentsDefinition(ctx *parser.ArgumentsDefinitionContext) interface{} {
@@ -322,13 +411,32 @@ func (b *ASTBuilder) VisitTypeSystemDirectiveLocation(ctx *parser.TypeSystemDire
 
 func (b *ASTBuilder) VisitName(ctx *parser.NameContext) interface{} {
 	fmt.Printf("VisitName: %s\n", ctx.GetText())
-	return b.VisitChildren(ctx)
+	return Node{
+		Name: ctx.GetText(),
+	}
 }
 
 func (b *ASTBuilder) VisitChildren(ctx antlr.RuleNode) interface{} {
-	for _, child := range ctx.GetChildren() {
-		child.(antlr.ParseTree).Accept(b)
+	if ctx.GetChildCount() > 1 {
+		var results []interface{}
+
+		for _, child := range ctx.GetChildren() {
+			result, ok := child.(antlr.ParseTree)
+
+			if ok && result != nil {
+				acceptance := result.Accept(b)
+
+				if acceptance != nil {
+					results = append(results, acceptance)
+				}
+
+			}
+
+		}
+
+		return results
+
 	}
 
-	return nil
+	return ctx.GetChild(0).(antlr.ParseTree).Accept(b)
 }
