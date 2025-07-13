@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/antlr4-go/antlr/v4"
-	"graphrpc.com/ast"
-	parser "graphrpc.com/parser/gen"
+	"github.com/vektah/gqlparser/v2"
+	"github.com/vektah/gqlparser/v2/ast"
 )
 
 func main() {
@@ -16,23 +15,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	filename := os.Args[1]
+	filepath := os.Args[1]
 
-	content, err := os.ReadFile(filename)
+	content, err := os.ReadFile(filepath)
 	if err != nil {
-		fmt.Printf("Error reading file %s: %v\n", filename, err)
-		os.Exit(1)
+		panic("Cannot parse file")
 	}
 
-	input := antlr.NewInputStream(string(content))
-	lexer := parser.NewGraphQLLexer(input)
-	stream := antlr.NewCommonTokenStream(lexer, 0)
-	p := parser.NewGraphQLParser(stream)
+	source := ast.Source{
+		Name:  "test",
+		Input: string(content),
+	}
 
-	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
+	schema, err := gqlparser.LoadSchema(&source)
+	if err != nil {
+		panic("Cannot parse schema")
+	}
 
-	tree := p.Document()
-
-	var builder = ast.NewASTBuilder()
-	tree.Accept(builder)
+	fmt.Printf("schema: %v\n", schema)
 }

@@ -2,14 +2,6 @@ module graphrpc.com
 
 go 1.22.3
 
-require (
-	github.com/antlr4-go/antlr/v4 v4.13.1
-	graphrpc.com/ast v0.0.0
-	graphrpc.com/parser v0.0.0
-)
+require github.com/vektah/gqlparser/v2 v2.5.30
 
-replace graphrpc.com/ast => ./ast
-
-replace graphrpc.com/parser => ./parser
-
-require golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
+require github.com/agnivade/levenshtein v1.2.1 // indirect
