@@ -1,9 +1,9 @@
-type Book {
-  title: String
-  author: Author
+type Starship {
+  id: ID!
+  name: String!
+  length(unit: LengthUnit = METER): Float
 }
 
-type Author {
-  name: String
-  books: [Book]
+type abb {
+  id: ID!
 }

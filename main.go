@@ -33,12 +33,13 @@ func main() {
 
 	tree := p.Document()
 
-	builder := ast.NewASTBuilder()
-	document := builder.BuildDocument(tree)
+	fmt.Printf("creating builderin")
+
+	var builder = ast.NewASTBuilder()
+
+	document := tree.Accept(builder)
+	fmt.Printf("Result: %v\n", document)
 
 	fmt.Println("=== Parsing Results ===")
 	fmt.Printf("File: %s\n", filename)
-	fmt.Printf("Definitions found: %d\n\n", len(document.Definitions))
-
 }
-

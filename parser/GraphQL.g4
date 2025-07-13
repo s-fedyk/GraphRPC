@@ -44,7 +44,7 @@ document
     ;
 
 definition
-
+    : executableDocument // deviation from 2018 (new)
     | typeSystemDocument //https://spec.graphql.org/October2021/#TypeSystemDocument (new in 2021)
     | typeSystemExtensionDocument
     ; //https://spec.graphql.org/October2021/#TypeSystemExtensionDocument (new in 2021)
